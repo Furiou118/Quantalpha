@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: quantalpha-api
+    runtime: docker
+    repo: https://github.com/Furiou118/quantalpha
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: ROOT_PATH
+        value: /api
+      - key: POLYGON_API_KEY
+        value: ""
+      - key: OANDA_API_KEY
+        value: ""
+      - key: OANDA_ACCOUNT
+        value: ""
+    healthCheckPath: /api/health
+
+  - type: static
+    name: quantalpha-dashboard
+    runtime: static
+    buildCommand: "cd dashboard && npm install && npm run build"
+    staticPublishPath: ./dashboard/dist
+    plan: free
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://quantalpha-api.onrender.com/api/*
